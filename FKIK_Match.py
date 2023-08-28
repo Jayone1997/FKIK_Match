@@ -452,8 +452,6 @@ def onTofkButton(*args):
         
         cmds.parent(text_in_textField7 + "_LOC", world=True) #Polevector LOC unparent
 
-        cmds.setAttr(PoleVector_pos, 0, 0, 0)
-
         # Get distance between Elbow and PoleVector:
         Shoulder_Ctrl = cmds.pointPosition(text_in_textField4 + "_LOC")
         PoleVector_Ctrl = cmds.pointPosition(text_in_textField7 + "_LOC")
@@ -490,7 +488,8 @@ def onTofkButton(*args):
         cmds.delete(cmds.parentConstraint(text_in_textField6, IK_Wrist_grp,  weight=1))
         parentC = cmds.parentConstraint(text_in_textField8 + "_LOC", text_in_textField8, weight=1)
         if BakeAnim:
-            cmds.setKeyframe(text_in_textField7)
+            cmds.setKeyframe(text_in_textField8)
+            
         cmds.delete(parentC)
 
         cmds.setAttr("{}.{}".format(selected_object, target_attr), IK_value)
@@ -680,7 +679,7 @@ def onTofkButtonAll(*args):
 if cmds.window("FKIKToolUI", exists=True):
     cmds.deleteUI("FKIKToolUI", window=True)
 
-cmds.window("FKIKToolUI", title="FK IK Match v1.0", widthHeight=(500, 500))
+cmds.window("FKIKToolUI", title="FK IK Match v1.0", widthHeight=(500, 800))
 cmds.columnLayout(adjustableColumn=True, columnOffset=("both", 5))
 
 cmds.separator(height=10)
