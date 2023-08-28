@@ -1,21 +1,14 @@
 import maya.cmds as cmds
 from functools import partial
 
-class LimbData:
-    def __init__(self):
-        self.limb_data_dict = {}
-        self.global_limb_name = ""
-        self.upperLOC = ""
-        self.lowerLOC = ""
-        self.endLOC = ""
-        self.upperJnt = ""
-        self.lowerJnt = ""
-        self.endJnt = ""
-        self.startFrame = int(cmds.playbackOptions(q=True, min=True))
-        self.endFrame = int(cmds.playbackOptions(q=True, max=True))
-        self.ActivatedLimb = None
-        self.textField9 = None
-        self.textField9_Atr = None
+limb_data_dict = {}
+global_limb_name = ""
+upperLOC = ""
+lowerLOC = ""
+endLOC = ""
+upperJnt = ""
+lowerJnt = ""
+endJnt = ""
 
 def Import_data(*args):
     file_browse = cmds.fileDialog2(fileFilter="Maya Files (*.ma *.mb)", dialogStyle=2, fileMode=1, okCaption="Import", caption="Import Data")
@@ -440,8 +433,6 @@ def onTofkButton(*args):
         text_in_textField8 = cmds.textField(textField8, query=True, text=True)
         IK_Wrist_grp = text_in_textField8 + "_grp"
         
-
-        # 해당 객체와 속성이 실제로 마야에서 존재하는지 확인
         if not cmds.objExists(selected_object):
             cmds.warning("Object '{}' does not exist.".format(selected_object))
             return
@@ -451,13 +442,17 @@ def onTofkButton(*args):
             return
         cmds.setAttr("{}.{}".format(selected_object, target_attr), FK_value)
 
+        cmds.xform(text_in_textField7 + "_LOC", translation=[0, 0, 0], worldSpace=True)
+
         cmds.delete(cmds.parentConstraint(text_in_textField1, text_in_textField1 + "_grp", w=1)) 
         cmds.delete(cmds.parentConstraint(text_in_textField2, text_in_textField2 + "_grp", w=1)) 
         cmds.delete(cmds.parentConstraint(text_in_textField6, text_in_textField3 + "_grp", w=1)) 
         cmds.delete(cmds.parentConstraint(text_in_textField2, text_in_textField5 + "_grp", w=1)) 
         cmds.delete(cmds.parentConstraint(text_in_textField6, text_in_textField6 + "_grp", w=1))
         
-        cmds.parent(text_in_textField7 + "_LOC", world=True) #폴벡터 LOC 자식 해제
+        cmds.parent(text_in_textField7 + "_LOC", world=True) #Polevector LOC unparent
+
+        cmds.setAttr(PoleVector_pos, 0, 0, 0)
 
         # Get distance between Elbow and PoleVector:
         Shoulder_Ctrl = cmds.pointPosition(text_in_textField4 + "_LOC")
@@ -500,7 +495,7 @@ def onTofkButton(*args):
 
         cmds.setAttr("{}.{}".format(selected_object, target_attr), IK_value)
 
-        cmds.parent(text_in_textField7 + "_LOC", text_in_textField2 + "_LOC") #폴벡터 LOC 자식 설정
+        cmds.parent(text_in_textField7 + "_LOC", text_in_textField2 + "_LOC") ##Polevector LOC parent
 
         cmds.select(clear=True)
 
@@ -517,6 +512,9 @@ def onToikButtonAll(*args):
     text_in_textField5 = cmds.textField(textField5, query=True, text=True)
     text_in_textField6 = cmds.textField(textField6, query=True, text=True)
 
+
+    startFrame = int(cmds.playbackOptions(q=True, min=True))
+    endFrame = int(cmds.playbackOptions(q=True, max=True))
     BakeAnim = cmds.checkBox(BakeAnim_checkbox, query=True, value=True)
 
     selected_object = cmds.textField(textField9, query=True, text=True)
@@ -591,6 +589,8 @@ def onTofkButtonAll(*args):
     FK_value = float(cmds.textField(textField9b, query=True, text=True))
     IK_value = float(cmds.textField(textField9c, query=True, text=True))
 
+    startFrame = int(cmds.playbackOptions(q=True, min=True))
+    endFrame = int(cmds.playbackOptions(q=True, max=True))
     BakeAnim = cmds.checkBox(BakeAnim_checkbox, query=True, value=True)
 
     text_in_textField1 = cmds.textField(textField1, query=True, text=True)
@@ -602,7 +602,6 @@ def onTofkButtonAll(*args):
     text_in_textField7 = cmds.textField(textField7, query=True, text=True)
     text_in_textField8 = cmds.textField(textField8, query=True, text=True)
     IK_Wrist_grp = text_in_textField8 + "_grp"
-    
 
     if cmds.textScrollList(ActivatedLimb, query=True, allItems=True):
         
@@ -618,6 +617,8 @@ def onTofkButtonAll(*args):
 
     else:
         cmds.warning("Add Activated Limb.")
+
+    cmds.xform(text_in_textField7 + "_LOC", translation=[0, 0, 0], worldSpace=True)
 
     for i in range(startFrame, endFrame + 1):
         cmds.currentTime(i)
@@ -809,7 +810,7 @@ rowLayout15 = cmds.rowLayout(numberOfColumns=1)
 BakeAnim_checkbox = cmds.checkBox(label='Bake Animation')
 cmds.setParent('..')
 
-# 리스트에 더블 클릭 이벤트 추가
+# List Double Click Event
 cmds.textScrollList(my_list, edit=True, doubleClickCommand=List_DoubleClick)
 
 cmds.showWindow("FKIKToolUI")
